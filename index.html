@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>APEX — AI Wellness System</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#050507;
+  --s1:#0a0a0f;
+  --s2:#0f0f17;
+  --s3:#161620;
+  --s4:#1c1c28;
+  --border:#1e1e2e;
+  --border2:#2a2a3e;
+  --border3:#363650;
+  --g:#00e5a0;
+  --g2:#00c488;
+  --b:#5b9fff;
+  --r:#ff4d5e;
+  --y:#f5c842;
+  --p:#9d6fff;
+  --w:#e8e8f0;
+  --muted:#52526e;
+  --muted2:#3a3a52;
+  --text:#d4d4e8;
+  --font:'Syne',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+  --display:'Bebas Neue',sans-serif;
+}
+html,body{height:100%;overflow:hidden;background:var(--bg)}
+body{color:var(--text);font-family:var(--font)}
+input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none}
+input[type=number]{-moz-appearance:textfield}
+scrollbar-width:thin;
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:var(--s1)}::-webkit-scrollbar-thumb{background:var(--border3);border-radius:3px}
+
+/* ── NAV ── */
+nav{height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:var(--s1);border-bottom:1px solid var(--border);position:relative;z-index:20}
+.nav-logo{font-family:var(--display);font-size:24px;letter-spacing:3px;color:var(--w);display:flex;align-items:center;gap:10px}
+.nav-logo-dot{width:8px;height:8px;border-radius:50%;background:var(--g);box-shadow:0 0 10px var(--g)}
+.nav-logo sub{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:2px;vertical-align:middle;margin-left:4px}
+.nav-tabs{display:flex;gap:2px;background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:3px}
+.nav-tab{padding:6px 20px;border-radius:8px;border:none;font-size:12px;font-weight:700;cursor:pointer;transition:all .25s;background:none;color:var(--muted);font-family:var(--font);letter-spacing:.5px}
+.nav-tab:hover{color:var(--text)}
+.nav-tab.active{background:var(--s4);color:var(--w);border:1px solid var(--border2)}
+.nav-tab.active.fit{color:var(--g);border-color:rgba(0,229,160,.2)}
+.nav-tab.active.diet{color:var(--y);border-color:rgba(245,200,66,.2)}
+.nav-right{display:flex;align-items:center;gap:8px}
+.conn-dot{width:6px;height:6px;border-radius:50%;background:var(--r)}
+.conn-dot.ok{background:var(--g);box-shadow:0 0 8px var(--g)}
+.conn-label{font-size:10px;font-family:var(--mono);color:var(--muted)}
+
+/* ── PAGES ── */
+.page{display:none;height:calc(100vh - 54px);overflow:hidden}
+.page.active{display:flex}
+
+/* ══════════════════════════════════════════
+   FITNESS PAGE
+══════════════════════════════════════════ */
+.fit-layout{display:grid;grid-template-columns:230px 1fr 270px;width:100%;height:100%}
+
+/* Left sidebar */
+.fit-left{background:var(--s1);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto}
+.sidebar-section{padding:14px 12px 6px}
+.sec-label{font-size:9px;font-family:var(--mono);color:var(--muted);letter-spacing:2.5px;text-transform:uppercase;margin-bottom:8px}
+
+.ex-card{margin:0 6px 4px;border-radius:9px;padding:9px 11px;cursor:pointer;border:1px solid transparent;transition:all .2s;display:flex;align-items:center;gap:10px}
+.ex-card:hover{background:var(--s2);border-color:var(--border)}
+.ex-card.active{background:var(--s2);border-color:rgba(0,229,160,.35);box-shadow:inset 0 0 0 1px rgba(0,229,160,.1)}
+.ex-ico{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;background:var(--s3)}
+.ex-card.active .ex-ico{background:rgba(0,229,160,.08)}
+.ex-name{font-size:12px;font-weight:700;margin-bottom:1px;color:var(--w)}
+.ex-muscle{font-size:10px;color:var(--muted);font-family:var(--mono)}
+.ex-check{margin-left:auto;font-size:11px;color:var(--muted2)}
+.ex-card.active .ex-check{color:var(--g)}
+
+.session-box{margin:6px 10px;background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:14px 12px;display:flex;flex-direction:column;gap:10px}
+.sess-row{display:flex;flex-direction:column;gap:2px}
+.sess-key{font-size:9px;font-family:var(--mono);color:var(--muted);letter-spacing:1.5px;text-transform:uppercase}
+.sess-val{font-size:20px;font-weight:700;font-family:var(--mono);color:var(--w)}
+.sess-val.green{color:var(--g)}
+.sess-val.red{color:var(--r)}
+
+/* Center */
+.fit-center{display:flex;flex-direction:column;background:var(--bg);padding:14px;gap:12px;overflow-y:auto}
+
+.cam-wrap{position:relative;border-radius:14px;overflow:hidden;background:var(--s1);border:1px solid var(--border);flex:1;min-height:260px;display:flex;align-items:center;justify-content:center}
+.cam-overlay{position:absolute;inset:0;pointer-events:none}
+.cam-tl{position:absolute;top:12px;left:12px;display:flex;gap:6px;align-items:center}
+.cam-br{position:absolute;bottom:12px;right:12px;display:flex;gap:6px;align-items:center}
+.cam-bl{position:absolute;bottom:12px;left:12px}
+.chip{font-size:10px;font-family:var(--mono);padding:4px 10px;border-radius:20px;font-weight:600;letter-spacing:.5px}
+.chip.g{background:rgba(0,229,160,.12);color:var(--g);border:1px solid rgba(0,229,160,.3)}
+.chip.b{background:rgba(91,159,255,.12);color:var(--b);border:1px solid rgba(91,159,255,.3)}
+.chip.r{background:rgba(255,77,94,.12);color:var(--r);border:1px solid rgba(255,77,94,.3)}
+.chip.muted{background:rgba(82,82,110,.15);color:var(--muted);border:1px solid var(--border)}
+.stage-pill{font-size:11px;font-weight:700;font-family:var(--mono);padding:5px 14px;border-radius:20px;letter-spacing:1px;transition:all .3s}
+.stage-pill.up{background:rgba(0,229,160,.15);color:var(--g);border:1px solid rgba(0,229,160,.4)}
+.stage-pill.down{background:rgba(91,159,255,.15);color:var(--b);border:1px solid rgba(91,159,255,.4)}
+.stage-pill.idle{background:rgba(82,82,110,.1);color:var(--muted);border:1px solid var(--border)}
+.cam-no-signal{font-size:12px;color:var(--muted);font-family:var(--mono);display:flex;flex-direction:column;align-items:center;gap:8px}
+.cam-no-signal svg{opacity:.3}
+
+/* Stat row */
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stat-box{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:13px;display:flex;flex-direction:column;gap:3px}
+.stat-lbl{font-size:9px;font-family:var(--mono);color:var(--muted);letter-spacing:1.5px;text-transform:uppercase}
+.stat-v{font-size:28px;font-weight:700;line-height:1;letter-spacing:-1px;font-family:var(--mono)}
+
+.reset-btn{padding:11px;border-radius:9px;background:rgba(255,77,94,.06);border:1px solid rgba(255,77,94,.2);color:var(--r);font-weight:700;cursor:pointer;font-family:var(--font);font-size:12px;letter-spacing:.5px;transition:all .2s}
+.reset-btn:hover{background:rgba(255,77,94,.12);border-color:rgba(255,77,94,.35)}
+
+/* Right panel */
+.fit-right{background:var(--s1);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto}
+.fit-right-inner{padding:14px 14px;display:flex;flex-direction:column;gap:14px}
+
+/* Rep progress circle */
+.rep-circle-wrap{display:flex;flex-direction:column;align-items:center;gap:12px}
+.rep-circle-svg{position:relative}
+.rep-circle-svg svg{transform:rotate(-90deg)}
+.rep-circle-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.rep-big{font-size:40px;font-family:var(--display);color:var(--g);line-height:1}
+.rep-target{font-size:11px;font-family:var(--mono);color:var(--muted)}
+.rep-controls{display:flex;gap:6px;align-items:center}
+.rep-inp{width:48px;text-align:center;background:var(--s2);border:1px solid var(--border2);border-radius:7px;color:var(--w);font-family:var(--mono);font-size:13px;padding:5px;outline:none}
+.rep-lbl{font-size:10px;color:var(--muted);font-family:var(--mono)}
+
+/* Angle gauge */
+.angle-section{background:var(--s2);border:1px solid var(--border);border-radius:11px;padding:13px}
+.angle-gauge-wrap{position:relative;width:100%;height:80px;margin:8px 0 4px}
+.gauge-track{position:absolute;bottom:0;left:0;right:0;height:10px;background:var(--s3);border-radius:5px;overflow:hidden}
+.gauge-fill{height:100%;border-radius:5px;transition:width .2s;background:linear-gradient(90deg,var(--g),var(--b))}
+.gauge-needle{position:absolute;bottom:3px;width:4px;height:16px;background:var(--w);border-radius:2px;transform:translateX(-50%);transition:left .2s;box-shadow:0 0 6px rgba(255,255,255,.4)}
+.gauge-labels{display:flex;justify-content:space-between;font-size:9px;font-family:var(--mono);color:var(--muted)}
+.angle-big{font-size:36px;font-family:var(--display);letter-spacing:1px;text-align:center;line-height:1}
+.angle-unit{font-size:10px;font-family:var(--mono);color:var(--muted);text-align:center}
+
+/* Form quality */
+.form-section{background:var(--s2);border:1px solid var(--border);border-radius:11px;padding:13px;display:flex;flex-direction:column;gap:8px}
+.form-row{display:flex;justify-content:space-between;align-items:center;font-size:11px}
+.form-key{font-family:var(--mono);color:var(--muted);font-size:10px;letter-spacing:.5px}
+.form-bar-wrap{flex:1;height:4px;background:var(--s3);border-radius:2px;margin:0 10px}
+.form-bar{height:100%;border-radius:2px;transition:width .5s;background:var(--g)}
+.form-val{font-family:var(--mono);font-size:10px;color:var(--muted)}
+
+/* Rep log */
+.rep-log-section{display:flex;flex-direction:column;gap:5px}
+.rep-row{display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--s2);border-radius:7px;font-size:11px;font-family:var(--mono);border:1px solid var(--border)}
+.rep-row-ex{color:var(--muted)}
+.rep-row-num{color:var(--g);font-weight:600}
+.rep-row-time{color:var(--muted2);font-size:10px}
+
+/* ══════════════════════════════════════════
+   DIET PAGE
+══════════════════════════════════════════ */
+.diet-layout{display:grid;grid-template-columns:260px 1fr 260px;width:100%;height:100%}
+.diet-left{background:var(--s1);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;padding:14px 12px}
+.diet-right{background:var(--s1);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;padding:14px 12px}
+
+.profile-card{background:var(--s2);border:1px solid var(--border);border-radius:11px;padding:14px;display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
+.pf-row{display:flex;flex-direction:column;gap:4px}
+.pf-row label{font-size:9px;font-family:var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:1.5px}
+.pf-row input,.pf-row select{width:100%;padding:8px 10px;background:var(--s3);border:1px solid var(--border2);border-radius:7px;color:var(--w);font-family:var(--mono);font-size:12px;outline:none;transition:border-color .2s}
+.pf-row input:focus,.pf-row select:focus{border-color:var(--border3)}
+.pf-row select option{background:var(--s3)}
+
+.macro-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px}
+.macro-box{background:var(--s2);border:1px solid var(--border);border-radius:9px;padding:11px;display:flex;flex-direction:column;gap:2px}
+.macro-box.full{grid-column:1/-1}
+.macro-k{font-size:9px;font-family:var(--mono);color:var(--muted);letter-spacing:1.5px;text-transform:uppercase}
+.macro-v{font-size:20px;font-family:var(--display);letter-spacing:1px;line-height:1.2}
+.macro-v.g{color:var(--g)}
+.macro-v.y{color:var(--y)}
+.macro-v.b{color:var(--b)}
+.macro-v.p{color:var(--p)}
+.macro-v.w{color:var(--w)}
+.macro-sub{font-size:9px;font-family:var(--mono);color:var(--muted2)}
+
+.calc-btn{width:100%;padding:10px;border-radius:8px;background:rgba(245,200,66,.07);border:1px solid rgba(245,200,66,.25);color:var(--y);font-weight:700;cursor:pointer;font-family:var(--font);font-size:12px;letter-spacing:.5px;transition:all .2s;margin-bottom:8px}
+.calc-btn:hover{background:rgba(245,200,66,.12);border-color:rgba(245,200,66,.4)}
+
+/* Chat */
+.diet-center{display:flex;flex-direction:column;background:var(--bg);padding:14px;gap:10px;overflow:hidden}
+.chat-header{display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.chat-title{font-size:13px;font-weight:700;color:var(--w);display:flex;align-items:center;gap:8px}
+.ai-badge{font-size:9px;font-family:var(--mono);padding:3px 8px;border-radius:20px;background:rgba(157,111,255,.12);border:1px solid rgba(157,111,255,.3);color:var(--p)}
+.chat-area{flex:1;display:flex;flex-direction:column;background:var(--s1);border:1px solid var(--border);border-radius:12px;overflow:hidden;min-height:0}
+.chat-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px}
+.msg{display:flex;flex-direction:column}
+.msg.user{align-items:flex-end}
+.msg.ai{align-items:flex-start}
+.msg-bubble{max-width:88%;padding:10px 14px;border-radius:12px;font-size:13px;line-height:1.6}
+.msg.ai .msg-bubble{background:var(--s2);border:1px solid var(--border);border-top-left-radius:2px;color:var(--text)}
+.msg.user .msg-bubble{background:rgba(245,200,66,.09);border:1px solid rgba(245,200,66,.2);border-top-right-radius:2px;color:var(--w)}
+.msg-time{font-size:9px;font-family:var(--mono);color:var(--muted2);padding:2px 4px}
+.typing-bubble{display:flex;gap:4px;align-items:center;padding:12px 14px;background:var(--s2);border:1px solid var(--border);border-radius:12px;border-top-left-radius:2px;width:fit-content}
+.typing-dot{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:typing .9s infinite}
+.typing-dot:nth-child(2){animation-delay:.15s}
+.typing-dot:nth-child(3){animation-delay:.3s}
+@keyframes typing{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-4px)}}
+
+.chat-input-row{display:flex;gap:8px;padding:12px;border-top:1px solid var(--border);flex-shrink:0}
+.chat-input{flex:1;background:var(--s2);border:1px solid var(--border2);border-radius:9px;color:var(--w);padding:10px 12px;font-size:13px;outline:none;resize:none;height:42px;font-family:var(--font);transition:border-color .2s}
+.chat-input:focus{border-color:rgba(245,200,66,.3)}
+.send-btn{padding:10px 14px;border-radius:9px;background:rgba(245,200,66,.1);border:1px solid rgba(245,200,66,.3);color:var(--y);cursor:pointer;transition:all .2s;font-size:16px}
+.send-btn:hover{background:rgba(245,200,66,.18)}
+
+/* Quick actions */
+.quick-actions{display:flex;flex-direction:column;gap:6px}
+.qa-btn{padding:10px 12px;border-radius:9px;background:var(--s2);border:1px solid var(--border);color:var(--text);cursor:pointer;font-family:var(--font);font-size:12px;font-weight:600;transition:all .2s;text-align:left;display:flex;align-items:center;gap:8px}
+.qa-btn:hover{border-color:rgba(245,200,66,.25);color:var(--y);background:rgba(245,200,66,.05)}
+.qa-emoji{font-size:15px}
+.qa-text{flex:1}
+
+/* Progress rings */
+.ring-row{display:flex;justify-content:space-around;padding:12px 0}
+.ring-item{display:flex;flex-direction:column;align-items:center;gap:6px}
+.ring-wrap{position:relative;width:56px;height:56px}
+.ring-wrap svg{transform:rotate(-90deg)}
+.ring-center{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-family:var(--mono);font-weight:600}
+.ring-label{font-size:9px;font-family:var(--mono);color:var(--muted);letter-spacing:1px;text-transform:uppercase}
+
+/* Meal suggestions */
+.meal-cards{display:flex;flex-direction:column;gap:6px}
+.meal-card{background:var(--s2);border:1px solid var(--border);border-radius:9px;padding:10px 12px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:10px}
+.meal-card:hover{border-color:rgba(245,200,66,.2);background:rgba(245,200,66,.03)}
+.meal-ico{font-size:18px;width:34px;text-align:center}
+.meal-info{flex:1}
+.meal-name{font-size:12px;font-weight:700;color:var(--w);margin-bottom:1px}
+.meal-cal{font-size:10px;font-family:var(--mono);color:var(--muted)}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">
+    <div class="nav-logo-dot"></div>
+    APEX <sub>WELLNESS SYSTEM</sub>
+  </div>
+  <div class="nav-tabs">
+    <button class="nav-tab active fit" onclick="showPage('fitness',this)">💪 Fitness Trainer</button>
+    <button class="nav-tab diet" onclick="showPage('diet',this)">🥗 Dietary Planner</button>
+  </div>
+  <div class="nav-right">
+    <div class="conn-dot" id="connDot"></div>
+    <span class="conn-label" id="connLabel">Connecting…</span>
+  </div>
+</nav>
+
+<!-- ════ FITNESS PAGE ════ -->
+<div class="page active" id="page-fitness">
+  <div class="fit-layout">
+
+    <!-- Left -->
+    <div class="fit-left">
+      <div class="sidebar-section">
+        <div class="sec-label">Exercises</div>
+        <div class="ex-card active" onclick="selectExercise('Bicep Curl',this)">
+          <div class="ex-ico">💪</div>
+          <div><div class="ex-name">Bicep Curl</div><div class="ex-muscle">Biceps / Forearms</div></div>
+          <div class="ex-check">✓</div>
+        </div>
+        <div class="ex-card" onclick="selectExercise('Lateral Raise',this)">
+          <div class="ex-ico">🙆</div>
+          <div><div class="ex-name">Lateral Raise</div><div class="ex-muscle">Deltoids / Traps</div></div>
+          <div class="ex-check">○</div>
+        </div>
+        <div class="ex-card" onclick="selectExercise('Squats',this)">
+          <div class="ex-ico">🦵</div>
+          <div><div class="ex-name">Squats</div><div class="ex-muscle">Quads / Glutes</div></div>
+          <div class="ex-check">○</div>
+        </div>
+        <div class="ex-card" onclick="selectExercise('Overhead Press',this)">
+          <div class="ex-ico">🏋️</div>
+          <div><div class="ex-name">Overhead Press</div><div class="ex-muscle">Deltoids / Triceps</div></div>
+          <div class="ex-check">○</div>
+        </div>
+        <div class="ex-card" onclick="selectExercise('Tricep Extension',this)">
+          <div class="ex-ico">💪</div>
+          <div><div class="ex-name">Tricep Extension</div><div class="ex-muscle">Triceps</div></div>
+          <div class="ex-check">○</div>
+        </div>
+        <div class="ex-card" onclick="selectExercise('Bench Press',this)">
+          <div class="ex-ico">👕</div>
+          <div><div class="ex-name">Bench Press</div><div class="ex-muscle">Chest / Triceps</div></div>
+          <div class="ex-check">○</div>
+        </div>
+        <div class="ex-card" onclick="selectExercise('Pull Ups',this)">
+          <div class="ex-ico">🧗</div>
+          <div><div class="ex-name">Pull Ups</div><div class="ex-muscle">Back / Biceps</div></div>
+          <div class="ex-check">○</div>
+        </div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sec-label">Session</div>
+        <div class="session-box">
+          <div class="sess-row"><div class="sess-key">Duration</div><div class="sess-val" id="fitTimer">00:00</div></div>
+          <div class="sess-row"><div class="sess-key">Est. Burn</div><div class="sess-val red" id="fitCal">0 kcal</div></div>
+          <div class="sess-row"><div class="sess-key">Sets Done</div><div class="sess-val green" id="fitSets">0</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Center -->
+    <div class="fit-center">
+      <div class="cam-wrap" id="camWrap">
+        <div class="cam-overlay">
+          <div class="cam-tl">
+            <span class="chip g" id="angleChip">—°</span>
+            <span class="chip muted" id="activeExLabel">BICEP CURL</span>
+          </div>
+          <div class="cam-bl">
+            <span class="stage-pill idle" id="stagePill">IDLE</span>
+          </div>
+          <div class="cam-br">
+            <span class="chip b" id="sideChip">LEFT ARM</span>
+          </div>
+        </div>
+        <div class="cam-no-signal">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M15 10l4.553-2.069A1 1 0 0121 8.87v6.26a1 1 0 01-1.447.899L15 14M3 8a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/></svg>
+          Camera Live Feed
+        </div>
+      </div>
+      <div class="stat-row">
+        <div class="stat-box">
+          <div class="stat-lbl">Rep Count</div>
+          <div class="stat-v" style="color:var(--g)" id="fitReps">0</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-lbl">Joint Angle</div>
+          <div class="stat-v" style="color:var(--b)" id="fitAngle">—°</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-lbl">Stage</div>
+          <div class="stat-v" style="font-size:18px;padding-top:6px;color:var(--muted)" id="fitStage">IDLE</div>
+        </div>
+      </div>
+      <button class="reset-btn" onclick="resetFit()">⟳ &nbsp;Reset Tracker</button>
+    </div>
+
+    <!-- Right -->
+    <div class="fit-right">
+      <div class="fit-right-inner">
+        <div class="sec-label">Rep Progress</div>
+        <div class="rep-circle-wrap">
+          <div class="rep-circle-svg" style="width:130px;height:130px">
+            <svg width="130" height="130" viewBox="0 0 130 130">
+              <circle cx="65" cy="65" r="55" fill="none" stroke="var(--s3)" stroke-width="10"/>
+              <circle cx="65" cy="65" r="55" fill="none" stroke="var(--g)" stroke-width="10"
+                stroke-dasharray="345.4" stroke-dashoffset="345.4" stroke-linecap="round"
+                id="repCircle" style="transition:stroke-dashoffset .4s"/>
+            </svg>
+            <div class="rep-circle-center">
+              <div class="rep-big" id="repBig">0</div>
+              <div class="rep-target">/ <span id="repTargetDisp">12</span></div>
+            </div>
+          </div>
+          <div class="rep-controls">
+            <span class="rep-lbl">Target:</span>
+            <input class="rep-inp" type="number" id="repTarget" value="12" min="1" max="99" oninput="updateTarget()"/>
+            <span class="rep-lbl">reps</span>
+          </div>
+        </div>
+
+        <div class="sec-label">Elbow Angle</div>
+        <div class="angle-section">
+          <div class="angle-big" id="angleBig" style="color:var(--g)">—</div>
+          <div class="angle-unit">degrees</div>
+          <div class="angle-gauge-wrap">
+            <div class="gauge-track">
+              <div class="gauge-fill" id="gaugeFill" style="width:0%"></div>
+            </div>
+            <div class="gauge-needle" id="gaugeNeedle" style="left:0%"></div>
+          </div>
+          <div class="gauge-labels"><span>0°</span><span>90°</span><span>180°</span></div>
+        </div>
+
+        <div class="sec-label">Form Quality</div>
+        <div class="form-section">
+          <div class="form-row">
+            <span class="form-key">Range</span>
+            <div class="form-bar-wrap"><div class="form-bar" id="fb-range" style="width:0%"></div></div>
+            <span class="form-val" id="fv-range">—</span>
+          </div>
+          <div class="form-row">
+            <span class="form-key">Speed</span>
+            <div class="form-bar-wrap"><div class="form-bar" id="fb-speed" style="width:0%;background:var(--b)"></div></div>
+            <span class="form-val" id="fv-speed">—</span>
+          </div>
+          <div class="form-row">
+            <span class="form-key">Control</span>
+            <div class="form-bar-wrap"><div class="form-bar" id="fb-ctrl" style="width:0%;background:var(--y)"></div></div>
+            <span class="form-val" id="fv-ctrl">—</span>
+          </div>
+          <div class="form-row">
+            <span class="form-key">Symmetry</span>
+            <div class="form-bar-wrap"><div class="form-bar" id="fb-sym" style="width:0%;background:var(--p)"></div></div>
+            <span class="form-val" id="fv-sym">—</span>
+          </div>
+        </div>
+
+        <div class="sec-label">Rep Log</div>
+        <div id="repLog" class="rep-log-section">
+          <div style="font-size:11px;font-family:var(--mono);color:var(--muted2);padding:6px 0">No reps yet</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ DIET PAGE ════ -->
+<div class="page" id="page-diet">
+  <div class="diet-layout">
+
+    <!-- Left -->
+    <div class="diet-left">
+      <div class="sec-label">User Profile</div>
+      <div class="profile-card">
+        <div class="pf-row"><label>Age</label><input type="number" id="pAge" value="22"/></div>
+        <div class="pf-row"><label>Weight (kg)</label><input type="number" id="pWeight" value="70"/></div>
+        <div class="pf-row"><label>Height (cm)</label><input type="number" id="pHeight" value="175"/></div>
+        <div class="pf-row"><label>Activity Level</label>
+          <select id="pActivity">
+            <option value="1.2">Sedentary</option>
+            <option value="1.375">Lightly Active</option>
+            <option value="1.55" selected>Moderate</option>
+            <option value="1.725">Very Active</option>
+            <option value="1.9">Athlete</option>
+          </select>
+        </div>
+        <div class="pf-row"><label>Goal</label>
+          <select id="pGoal">
+            <option value="lose">Weight Loss</option>
+            <option value="maintain">Maintain</option>
+            <option value="gain" selected>Muscle Gain</option>
+          </select>
+        </div>
+        <div class="pf-row"><label>Sex</label>
+          <select id="pSex">
+            <option value="male" selected>Male</option>
+            <option value="female">Female</option>
+          </select>
+        </div>
+      </div>
+      <button class="calc-btn" onclick="calcMacros()">⚡ Calculate Macros</button>
+
+      <div class="sec-label">Macro Targets</div>
+      <div class="macro-grid">
+        <div class="macro-box full"><div class="macro-k">Calories</div><div class="macro-v y" id="mCal">2500</div><div class="macro-sub">kcal / day</div></div>
+        <div class="macro-box"><div class="macro-k">Protein</div><div class="macro-v g" id="mPro">180g</div></div>
+        <div class="macro-box"><div class="macro-k">Carbs</div><div class="macro-v b" id="mCarb">250g</div></div>
+        <div class="macro-box"><div class="macro-k">Fat</div><div class="macro-v p" id="mFat">70g</div></div>
+        <div class="macro-box"><div class="macro-k">BMI</div><div class="macro-v w" id="mBmi">22.9</div></div>
+      </div>
+    </div>
+
+    <!-- Center Chat -->
+    <div class="diet-center">
+      <div class="chat-header">
+        <div class="chat-title">
+          🤖 APEX Coach
+          <span class="ai-badge">Stay Fit</span>
+        </div>
+      </div>
+      <div class="chat-area">
+        <div class="chat-msgs" id="chatMsgs">
+          <div class="msg ai">
+            <div class="msg-bubble">Hey! I'm your APEX Nutrition Coach, powered by Gemini. Tell me your goals and I'll craft a personalized meal plan, macro breakdown, or answer any diet question you have. 🥗</div>
+            <div class="msg-time">Just now</div>
+          </div>
+        </div>
+        <div class="chat-input-row">
+          <textarea class="chat-input" id="chatInput" placeholder="Ask about meal plans, macros, recipes..." onkeydown="handleKey(event)"></textarea>
+          <button class="send-btn" onclick="sendChat()">➤</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right -->
+    <div class="diet-right">
+      <div class="sec-label">Quick Asks</div>
+      <div class="quick-actions">
+        <div class="qa-btn" onclick="quickAsk('Generate a full day meal plan based on my macros for muscle gain with 2500 calories')">
+          <span class="qa-emoji">🍽️</span><span class="qa-text">Full Day Meal Plan</span>
+        </div>
+        <div class="qa-btn" onclick="quickAsk('What are the best high protein snacks for muscle building? Give me 5 options with calories.')">
+          <span class="qa-emoji">🍗</span><span class="qa-text">High Protein Snacks</span>
+        </div>
+        <div class="qa-btn" onclick="quickAsk('Give me a pre-workout meal idea that is easy to digest and gives energy.')">
+          <span class="qa-emoji">⚡</span><span class="qa-text">Pre-Workout Meal</span>
+        </div>
+        <div class="qa-btn" onclick="quickAsk('What should I eat post-workout for maximum muscle recovery? Include timing.')">
+          <span class="qa-emoji">🔋</span><span class="qa-text">Post-Workout Recovery</span>
+        </div>
+        <div class="qa-btn" onclick="quickAsk('Give me a high-protein vegetarian meal plan for one day.')">
+          <span class="qa-emoji">🥦</span><span class="qa-text">Vegetarian Options</span>
+        </div>
+        <div class="qa-btn" onclick="quickAsk('List the top 5 foods I should eat every week for optimal fitness and muscle gain.')">
+          <span class="qa-emoji">🏆</span><span class="qa-text">Power Foods List</span>
+        </div>
+      </div>
+
+      <div class="sec-label" style="margin-top:16px">Daily Intake Rings</div>
+      <div class="ring-row">
+        <div class="ring-item">
+          <div class="ring-wrap">
+            <svg width="56" height="56"><circle cx="28" cy="28" r="22" fill="none" stroke="var(--s3)" stroke-width="6"/><circle cx="28" cy="28" r="22" fill="none" stroke="var(--g)" stroke-width="6" stroke-dasharray="138.2" stroke-dashoffset="138.2" stroke-linecap="round" id="ring-pro" style="transition:stroke-dashoffset .5s"/></svg>
+            <div class="ring-center" style="color:var(--g)" id="rp-pro">0%</div>
+          </div>
+          <div class="ring-label">Protein</div>
+        </div>
+        <div class="ring-item">
+          <div class="ring-wrap">
+            <svg width="56" height="56"><circle cx="28" cy="28" r="22" fill="none" stroke="var(--s3)" stroke-width="6"/><circle cx="28" cy="28" r="22" fill="none" stroke="var(--b)" stroke-width="6" stroke-dasharray="138.2" stroke-dashoffset="138.2" stroke-linecap="round" id="ring-carb" style="transition:stroke-dashoffset .5s"/></svg>
+            <div class="ring-center" style="color:var(--b)" id="rp-carb">0%</div>
+          </div>
+          <div class="ring-label">Carbs</div>
+        </div>
+        <div class="ring-item">
+          <div class="ring-wrap">
+            <svg width="56" height="56"><circle cx="28" cy="28" r="22" fill="none" stroke="var(--s3)" stroke-width="6"/><circle cx="28" cy="28" r="22" fill="none" stroke="var(--p)" stroke-width="6" stroke-dasharray="138.2" stroke-dashoffset="138.2" stroke-linecap="round" id="ring-fat" style="transition:stroke-dashoffset .5s"/></svg>
+            <div class="ring-center" style="color:var(--p)" id="rp-fat">0%</div>
+          </div>
+          <div class="ring-label">Fat</div>
+        </div>
+      </div>
+
+      <div class="sec-label" style="margin-top:8px">Quick Meals</div>
+      <div class="meal-cards">
+        <div class="meal-card" onclick="quickAsk('Give me a detailed recipe for Greek Yogurt Parfait with macros.')">
+          <div class="meal-ico">🥣</div>
+          <div class="meal-info"><div class="meal-name">Yogurt Parfait</div><div class="meal-cal">~320 kcal · 28g protein</div></div>
+        </div>
+        <div class="meal-card" onclick="quickAsk('Give me a detailed recipe for Chicken & Rice bowl with macros.')">
+          <div class="meal-ico">🍚</div>
+          <div class="meal-info"><div class="meal-name">Chicken & Rice</div><div class="meal-cal">~550 kcal · 45g protein</div></div>
+        </div>
+        <div class="meal-card" onclick="quickAsk('Give me a detailed recipe for a Protein Smoothie with macros.')">
+          <div class="meal-ico">🥤</div>
+          <div class="meal-info"><div class="meal-name">Protein Smoothie</div><div class="meal-cal">~380 kcal · 35g protein</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── CONFIG ───────────────────────────────────────────────────────────────────
+// All routes are relative (/chat, /state, /reset) — served by Flask at localhost:5000
+const pad = n => n < 10 ? '0' + n : String(n);
+
+// ─── PAGE SWITCHING ───────────────────────────────────────────────────────────
+function showPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ─── FITNESS ─────────────────────────────────────────────────────────────────
+let repTarget = 12;
+let prevAngle = 0;
+let repTimestamps = [];
+
+function updateTarget() {
+  repTarget = parseInt(document.getElementById('repTarget').value) || 12;
+  document.getElementById('repTargetDisp').textContent = repTarget;
+  updateRepCircle(parseInt(document.getElementById('fitReps').textContent) || 0);
+}
+
+function updateRepCircle(count) {
+  const pct = Math.min(count / repTarget, 1);
+  const circ = 345.4;
+  document.getElementById('repCircle').style.strokeDashoffset = circ - pct * circ;
+  document.getElementById('repBig').textContent = count;
+  // Color changes when done
+  document.getElementById('repCircle').style.stroke = pct >= 1 ? 'var(--y)' : 'var(--g)';
+}
+
+function updateAngleGauge(angle) {
+  if (isNaN(angle) || angle === 0) return;
+  const pct = Math.min(angle / 180, 1) * 100;
+  document.getElementById('gaugeFill').style.width = pct + '%';
+  document.getElementById('gaugeNeedle').style.left = pct + '%';
+  document.getElementById('angleBig').textContent = Math.round(angle) + '°';
+  // Color based on range
+  const color = angle < 60 ? 'var(--g)' : angle < 120 ? 'var(--y)' : 'var(--b)';
+  document.getElementById('angleBig').style.color = color;
+}
+
+function updateFormBars(reps, angle) {
+  if (reps < 1) return;
+  // Simulate form metrics (replace with real data from backend if available)
+  const range = Math.min(100, Math.round((Math.abs(180 - angle) / 140) * 100));
+  const speed = Math.min(100, 60 + Math.random() * 30);
+  const ctrl = Math.min(100, 55 + Math.random() * 35);
+  const sym = Math.min(100, 65 + Math.random() * 25);
+  setFormBar('range', range);
+  setFormBar('speed', speed);
+  setFormBar('ctrl', ctrl);
+  setFormBar('sym', sym);
+}
+
+function setFormBar(id, val) {
+  document.getElementById('fb-' + id).style.width = val + '%';
+  document.getElementById('fv-' + id).textContent = val < 40 ? 'Poor' : val < 70 ? 'OK' : 'Good';
+}
+
+async function selectExercise(name, el) {
+  document.querySelectorAll('.ex-card').forEach(c => { c.classList.remove('active'); c.querySelector('.ex-check').textContent = '○'; });
+  el.classList.add('active');
+  el.querySelector('.ex-check').textContent = '✓';
+  document.getElementById('activeExLabel').textContent = name.toUpperCase();
+  try {
+    await fetch('/set_exercise', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ exercise: name }) });
+  } catch (e) {}
+  resetFit();
+}
+
+async function fetchFit() {
+  try {
+    const r = await fetch('/state');
+    const d = await r.json();
+    document.getElementById('connDot').className = 'conn-dot ok';
+    document.getElementById('connLabel').textContent = 'Online';
+    const reps = d.counter;
+    const angle = parseFloat(d.angle);
+    const stage = d.stage;
+    document.getElementById('fitReps').textContent = reps;
+    document.getElementById('fitAngle').textContent = Math.round(angle) + '°';
+    document.getElementById('angleChip').textContent = Math.round(angle) + '°';
+    document.getElementById('stagePill').className = 'stage-pill ' + stage;
+    document.getElementById('stagePill').textContent = stage.toUpperCase();
+    document.getElementById('fitStage').textContent = stage.toUpperCase();
+    const m = Math.floor(d.elapsed / 60), s = Math.floor(d.elapsed % 60);
+    document.getElementById('fitTimer').textContent = pad(m) + ':' + pad(s);
+    document.getElementById('fitCal').textContent = Math.round(d.elapsed * 0.07 + reps * 0.8) + ' kcal';
+    document.getElementById('fitSets').textContent = Math.floor(reps / 12);
+    updateRepCircle(reps);
+    updateAngleGauge(angle);
+    updateFormBars(reps, angle);
+    if (d.rep_log && d.rep_log.length) {
+      document.getElementById('repLog').innerHTML = d.rep_log.slice(-8).reverse().map(r =>
+        `<div class="rep-row"><span class="rep-row-ex">${r.ex}</span><span class="rep-row-num">#${r.rep}</span><span class="rep-row-time">✓</span></div>`
+      ).join('');
+    }
+  } catch {
+    document.getElementById('connDot').className = 'conn-dot';
+    document.getElementById('connLabel').textContent = 'Backend Offline';
+  }
+}
+
+async function resetFit() {
+  updateRepCircle(0);
+  document.getElementById('fitSets').textContent = '0';
+  ['range','speed','ctrl','sym'].forEach(k => { document.getElementById('fb-'+k).style.width='0%'; document.getElementById('fv-'+k).textContent='—'; });
+  document.getElementById('repLog').innerHTML = '<div style="font-size:11px;font-family:var(--mono);color:var(--muted2);padding:6px 0">No reps yet</div>';
+  try { await fetch('/reset', { method: 'POST' }); } catch (e) {}
+}
+
+setInterval(fetchFit, 250);
+
+// ─── DIET / MACROS ────────────────────────────────────────────────────────────
+function calcMacros() {
+  const age = parseInt(document.getElementById('pAge').value) || 22;
+  const w = parseFloat(document.getElementById('pWeight').value) || 70;
+  const h = parseFloat(document.getElementById('pHeight').value) || 175;
+  const sex = document.getElementById('pSex').value;
+  const act = parseFloat(document.getElementById('pActivity').value);
+  const goal = document.getElementById('pGoal').value;
+
+  // Mifflin-St Jeor
+  let bmr = sex === 'male'
+    ? 10 * w + 6.25 * h - 5 * age + 5
+    : 10 * w + 6.25 * h - 5 * age - 161;
+  let tdee = Math.round(bmr * act);
+  if (goal === 'gain') tdee += 300;
+  else if (goal === 'lose') tdee -= 400;
+
+  const pro = Math.round(w * 2.2);
+  const fat = Math.round(w * 0.9);
+  const carb = Math.round((tdee - pro * 4 - fat * 9) / 4);
+  const bmi = (w / ((h / 100) ** 2)).toFixed(1);
+
+  document.getElementById('mCal').textContent = tdee;
+  document.getElementById('mPro').textContent = pro + 'g';
+  document.getElementById('mCarb').textContent = carb + 'g';
+  document.getElementById('mFat').textContent = fat + 'g';
+  document.getElementById('mBmi').textContent = bmi;
+
+  // Update rings (simulate partial fill as demo)
+  setRing('ring-pro', 75);
+  setRing('ring-carb', 60);
+  setRing('ring-fat', 45);
+  document.getElementById('rp-pro').textContent = '75%';
+  document.getElementById('rp-carb').textContent = '60%';
+  document.getElementById('rp-fat').textContent = '45%';
+}
+
+function setRing(id, pct) {
+  const circ = 138.2;
+  document.getElementById(id).style.strokeDashoffset = circ - (pct / 100) * circ;
+}
+
+// ─── GEMINI CHAT (proxied through Flask — no browser CORS issues) ─────────────
+let chatHistory = [];
+
+function getProfile() {
+  return {
+    age: document.getElementById('pAge').value,
+    weight: document.getElementById('pWeight').value + 'kg',
+    height: document.getElementById('pHeight').value + 'cm',
+    goal: document.getElementById('pGoal').value,
+    activity: document.getElementById('pActivity').options[document.getElementById('pActivity').selectedIndex].text,
+    calories: document.getElementById('mCal').textContent,
+    protein: document.getElementById('mPro').textContent,
+    carbs: document.getElementById('mCarb').textContent,
+    fat: document.getElementById('mFat').textContent,
+  };
+}
+
+function addMsg(role, html) {
+  const box = document.getElementById('chatMsgs');
+  const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const div = document.createElement('div');
+  div.className = 'msg ' + role;
+  div.innerHTML = `<div class="msg-bubble">${html}</div><div class="msg-time">${now}</div>`;
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+}
+
+function showTyping() {
+  const box = document.getElementById('chatMsgs');
+  const div = document.createElement('div');
+  div.className = 'msg ai'; div.id = 'typingIndicator';
+  div.innerHTML = `<div class="typing-bubble"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>`;
+  box.appendChild(div); box.scrollTop = box.scrollHeight;
+}
+function hideTyping() {
+  const el = document.getElementById('typingIndicator');
+  if (el) el.remove();
+}
+
+async function sendChat() {
+  const inp = document.getElementById('chatInput');
+  const msg = inp.value.trim();
+  if (!msg) return;
+  inp.value = '';
+  addMsg('user', msg);
+  chatHistory.push({ role: 'user', parts: [{ text: msg }] });
+  showTyping();
+
+  try {
+    // ✅ Call Flask backend at /chat — backend calls Gemini server-side
+    // This avoids browser CORS blocks when hitting Gemini directly
+    const res = await fetch('/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message: msg,
+        history: chatHistory,   // full conversation for multi-turn context
+        profile: getProfile()   // user profile injected into system prompt
+      })
+    });
+    const data = await res.json();
+    const reply = data.reply || 'No response received from Gemini.';
+    chatHistory.push({ role: 'model', parts: [{ text: reply }] });
+    hideTyping();
+    addMsg('ai', reply.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'));
+  } catch (e) {
+    hideTyping();
+    addMsg('ai', '⚠️ Could not reach Flask backend. Make sure <code>python Project.py</code> is running.');
+  }
+}
+
+function quickAsk(q) {
+  document.getElementById('chatInput').value = q;
+  sendChat();
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); }
+}
+
+// Init macros on load
+calcMacros();
+</script>
+</body>
+</html>
